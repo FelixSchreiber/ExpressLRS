@@ -36,8 +36,8 @@ https://github.com/jaxxzer
     #define DEVICE_NAME "Jumper R900 MINI"
 #elif defined(TARGET_R900_RX)
     #ifndef CRSF_RCVR_NO_SERIAL
-        #define GPIO_PIN_RCSIGNAL_RX    PA3 // convinient pin for direct chip solder    
-        #define GPIO_PIN_RCSIGNAL_TX    PA2 // convinient pin for direct chip solder
+        #define GPIO_PIN_RCSIGNAL_RX    PA3 // channel 5 pin
+        #define GPIO_PIN_RCSIGNAL_TX    PA2 // channel 6 pin
     #else
         #define GPIO_PIN_RCSIGNAL_RX    -1
         #define GPIO_PIN_RCSIGNAL_TX    -1
@@ -85,7 +85,8 @@ https://github.com/jaxxzer
     /* PB9: antenna 1 (left) = HIGH, antenna 2 (right) = LOW
      * Note: Right Antenna is selected by default, LOW */
     #define GPIO_PIN_ANTENNA_SELECT PB9    
-    /* use PA9 (SBus pin) as arming channel */
+    /* use PA9 (SBus pin, inverted) as arming channel 
+     * so channels 1, 2, 3, 4, 6, 7, 8, 9 are available on the servo connectors */
     #ifndef CRSF_RCVR_NO_SERIAL
         #define GPIO_PIN_PWM_OUTPUTS    {PB1, PB0, PA7, PA6, PA9, PA1, PA0}
     #else
