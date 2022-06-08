@@ -34,6 +34,15 @@ https://github.com/jaxxzer
     #define GPIO_PIN_RCSIGNAL_RX    PA3 // convinient pin for direct chip solder
     #define GPIO_PIN_RCSIGNAL_TX    PA2 // convinient pin for direct chip solder
     #define DEVICE_NAME "Jumper R900 MINI"
+#elif defined(TARGET_R900_RX)
+    #ifndef CRSF_RCVR_NO_SERIAL
+        #define GPIO_PIN_RCSIGNAL_RX    PA3 // convinient pin for direct chip solder    
+        #define GPIO_PIN_RCSIGNAL_TX    PA2 // convinient pin for direct chip solder
+    #else
+        #define GPIO_PIN_RCSIGNAL_RX    -1
+        #define GPIO_PIN_RCSIGNAL_TX    -1
+    #endif
+    #define DEVICE_NAME "Jumper R900"
 #else
     #define GPIO_PIN_RCSIGNAL_RX    PA10
     #define GPIO_PIN_RCSIGNAL_TX    PA9
@@ -67,6 +76,21 @@ https://github.com/jaxxzer
     #define GPIO_PIN_BUTTON         PC13 // pullup e.g. LOW when pressed
     // RF Switch: HIGH = RX, LOW = TX
     #define GPIO_PIN_RX_ENABLE      PB3
+#elif defined(TARGET_R900_RX)
+    #define GPIO_PIN_LED_RED        PA11 // Red
+    #define GPIO_PIN_LED_GREEN      PA12 // Green
+    #define GPIO_PIN_BUTTON         PC13 // pullup e.g. LOW when pressed
+    // RF Switch: HIGH = RX, LOW = TX
+    #define GPIO_PIN_RX_ENABLE      PB3
+    /* PB9: antenna 1 (left) = HIGH, antenna 2 (right) = LOW
+     * Note: Right Antenna is selected by default, LOW */
+    #define GPIO_PIN_ANTENNA_SELECT PB9    
+    /* use PA9 (SBus pin) as arming channel */
+    #ifndef CRSF_RCVR_NO_SERIAL
+        #define GPIO_PIN_PWM_OUTPUTS    {PB1, PB0, PA7, PA6, PA9, PA1, PA0}
+    #else
+        #define GPIO_PIN_PWM_OUTPUTS    {PB1, PB0, PA7, PA6, PA9, PA3, PA2, PA1, PA0}
+    #endif
 #else //R9MM_R9MINI
     #define GPIO_PIN_LED_RED        PC1  // Red
     #define GPIO_PIN_LED_GREEN      PB3  // Green

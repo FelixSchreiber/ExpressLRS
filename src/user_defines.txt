@@ -107,3 +107,7 @@
 
 # These debugging options send extra information to BetaFlight in the LinkStatistics packet
 #-DDEBUG_BF_LINK_STATS
+
+
+# Uncomment to disable output of serial crossfire data via UART (and free UART for other purposes)
+#-DCRSF_RCVR_NO_SERIAL
