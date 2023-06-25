@@ -1,7 +1,10 @@
-#if defined(PLATFORM_ESP32) || defined(PLATFORM_ESP8266)
+#if defined(PLATFORM_ESP32) || defined(PLATFORM_ESP8266) || defined(TARGET_R900_RX) 
 #pragma once
 
 #include <Arduino.h>
+#if defined(TARGET_R900_RX)
+#include <Servo.h>
+#endif
 class ServoMgr
 {
 public:
@@ -33,6 +36,8 @@ private:
 #if defined(PLATFORM_ESP32)
     uint32_t _timerConfigs[8] = {0};
     void allocateLedcChn(uint8_t ch, uint16_t intervalUs, uint8_t pin);
+#elif defined(TARGET_R900_RX)
+    Servo *_servos[GPIO_PIN_PWM_OUTPUTS_COUNT];
 #endif
     const uint8_t *const _pins;
     const uint8_t _outputCnt;

@@ -239,7 +239,7 @@
 
 #if defined(DEBUG_CRSF_NO_OUTPUT)
 #define OPT_CRSF_RCVR_NO_SERIAL true
-#elif defined(TARGET_UNIFIED_RX)
+#elif defined(TARGET_UNIFIED_RX) ||  defined(TARGET_R900_RX)
 extern bool pwmSerialDefined;
 
 #define OPT_CRSF_RCVR_NO_SERIAL (GPIO_PIN_RCSIGNAL_RX == UNDEF_PIN && GPIO_PIN_RCSIGNAL_TX == UNDEF_PIN && !pwmSerialDefined)

@@ -126,7 +126,12 @@ static void initialize()
 
     for (int ch = 0; ch < GPIO_PIN_PWM_OUTPUTS_COUNT; ++ch)
     {
+#if defined(TARGET_R900_RX)
+        static constexpr uint8_t GPIO_PIN_PWM_OUTPUTS__[] = GPIO_PIN_PWM_OUTPUTS;
+        uint8_t pin = GPIO_PIN_PWM_OUTPUTS__[ch];
+#else
         uint8_t pin = GPIO_PIN_PWM_OUTPUTS[ch];
+#endif
 #if (defined(DEBUG_LOG) || defined(DEBUG_RCVR_LINKSTATS)) && (defined(PLATFORM_ESP8266) || defined(PLATFORM_ESP32))
         // Disconnect the debug UART pins if DEBUG_LOG
         if (pin == 1 || pin == 3)

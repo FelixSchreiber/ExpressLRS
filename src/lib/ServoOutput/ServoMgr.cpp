@@ -1,8 +1,10 @@
-#if defined(PLATFORM_ESP8266) || defined(PLATFORM_ESP32)
+#if defined(PLATFORM_ESP8266) || defined(PLATFORM_ESP32) || defined(TARGET_R900_RX)
 
 #include "ServoMgr.h"
 #include "logging.h"
+#if defined(PLATFORM_ESP8266) || defined(PLATFORM_ESP32) 
 #include "waveform_8266.h"
+#endif
 #include <math.h>
 
 ServoMgr::ServoMgr(const uint8_t *const pins, const uint8_t outputCnt, uint32_t defaultInterval)
@@ -116,6 +118,8 @@ void ServoMgr::writeMicroseconds(uint8_t ch, uint16_t valueUs)
     _activePwmChannels |= (1 << ch);
 #if defined(PLATFORM_ESP32)
     ledcWrite(ch, map(valueUs, 0, _refreshInterval[ch], 0, (1 << _resolution_bits[ch]) - 1));
+#elif defined(TARGET_R900_RX)
+    _servos[ch]->writeMicroseconds(valueUs);
 #else
     startWaveform8266(pin, valueUs, _refreshInterval[ch] - valueUs);
 #endif
@@ -131,6 +135,9 @@ void ServoMgr::writeDuty(uint8_t ch, uint16_t duty)
     _activePwmChannels |= (1 << ch);
 #if defined(PLATFORM_ESP32)
     ledcWrite(ch, map(duty, 0, 1000, 0, (1 << _resolution_bits[ch]) - 1));
+#elif defined(TARGET_R900_RX)
+    uint16_t high = map(duty, 0, 1000, 0, _refreshInterval[ch]);
+    _servos[ch]->writeMicroseconds(high);
 #else
     uint16_t high = map(duty, 0, 1000, 0, _refreshInterval[ch]);
     startWaveform8266(pin, high, _refreshInterval[ch] - high);
@@ -149,6 +156,16 @@ void ServoMgr::setRefreshInterval(uint8_t ch, uint16_t intervalUs)
             return;
         }
         allocateLedcChn(ch, intervalUs, pin);
+#elif defined(TARGET_R900_RX)
+        // keep refresh intervall at 50Hz
+        _refreshInterval[ch] = 20000U;
+        const uint8_t pin = _pins[ch];
+        if (pin == PIN_DISCONNECTED)
+        {
+            return;
+        }
+        _servos[ch] = new Servo();
+        _servos[ch]->attach(pin, 988U, 2012U, 1500U);
 #endif
     }
 }
@@ -163,6 +180,7 @@ void ServoMgr::stopPwm(uint8_t ch)
     _activePwmChannels &= ~(1 << ch);
 #if defined(PLATFORM_ESP32)
     ledcDetachPin(pin);
+#elif defined(TARGET_R900_RX)
 #else
     stopWaveform8266(pin);
 #endif

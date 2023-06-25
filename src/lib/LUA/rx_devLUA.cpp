@@ -160,11 +160,20 @@ static void luaparamMappingChannelOut(struct luaPropertiesCommon *item, uint8_t 
 {
   setLuaUint8Value(&luaMappingChannelOut, arg);
   // Must trigger an event because this is not a persistent config item
+#if defined(TARGET_R900_RX)
+  static constexpr uint8_t GPIO_PIN_PWM_OUTPUTS__[] = GPIO_PIN_PWM_OUTPUTS;
+  if (GPIO_PIN_PWM_OUTPUTS__[arg-1] == GPIO_PIN_RCSIGNAL_RX)
+#else
   if (GPIO_PIN_PWM_OUTPUTS[arg-1] == 3)
+#endif
   {
     luaMappingOutputMode.options = rxModes;
   }
+#if defined(TARGET_R900_RX)
+  else if (GPIO_PIN_PWM_OUTPUTS__[arg-1] == GPIO_PIN_RCSIGNAL_TX)
+#else
   else if (GPIO_PIN_PWM_OUTPUTS[arg-1] == 1)
+#endif
   {
     luaMappingOutputMode.options = txModes;
   }
@@ -187,9 +196,16 @@ static void luaparamMappingChannelIn(struct luaPropertiesCommon *item, uint8_t a
 
 static uint8_t configureSerialPin(uint8_t pin, uint8_t sibling, uint8_t oldMode, uint8_t newMode)
 {
+#if defined(TARGET_R900_RX)
+  static constexpr uint8_t GPIO_PIN_PWM_OUTPUTS__[] = GPIO_PIN_PWM_OUTPUTS;
+#endif
   for (int ch=0 ; ch<GPIO_PIN_PWM_OUTPUTS_COUNT ; ch++)
   {
+#if defined(TARGET_R900_RX)
+    if (GPIO_PIN_PWM_OUTPUTS__[ch] == sibling)
+#else
     if (GPIO_PIN_PWM_OUTPUTS[ch] == sibling)
+#endif
     {
       // set sibling pin channel settings based on this pins settings
       rx_config_pwm_t newPin3Config;
@@ -223,14 +239,29 @@ static void luaparamMappingOutputMode(struct luaPropertiesCommon *item, uint8_t 
   newPwmCh.val.mode = arg;
 
   // Check if pin == 1/3 and do other pin adjustment accordingly
+#if defined(TARGET_R900_RX)
+  static constexpr uint8_t GPIO_PIN_PWM_OUTPUTS__[] = GPIO_PIN_PWM_OUTPUTS;
+  if (GPIO_PIN_PWM_OUTPUTS__[ch] == GPIO_PIN_RCSIGNAL_RX)
+  {
+    newPwmCh.val.mode = configureSerialPin(GPIO_PIN_RCSIGNAL_RX, GPIO_PIN_RCSIGNAL_TX, oldMode, arg);
+  }
+#else
   if (GPIO_PIN_PWM_OUTPUTS[ch] == 1)
   {
     newPwmCh.val.mode = configureSerialPin(1, 3, oldMode, arg);
   }
+#endif
+#if defined(TARGET_R900_RX)
+  else if (GPIO_PIN_PWM_OUTPUTS__[ch] == GPIO_PIN_RCSIGNAL_TX)
+  {
+    newPwmCh.val.mode = configureSerialPin(GPIO_PIN_RCSIGNAL_TX, GPIO_PIN_RCSIGNAL_RX, oldMode, arg);
+  }
+#else
   else if (GPIO_PIN_PWM_OUTPUTS[ch] == 3)
   {
     newPwmCh.val.mode = configureSerialPin(3, 1, oldMode, arg);
   }
+#endif
   else if (arg == somSerial)
   {
     newPwmCh.val.mode = oldMode;
