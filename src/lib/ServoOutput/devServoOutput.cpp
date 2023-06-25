@@ -119,6 +119,10 @@ static int servosUpdate(unsigned long now)
 
 static void initialize()
 {
+// hack because I don't know how to implement GPIO_PIN_PWM_OUTPUTS the right way
+#if defined(TARGET_R900_RX)
+    static constexpr uint8_t GPIO_PIN_PWM_OUTPUTS__[] = GPIO_PIN_PWM_OUTPUTS;
+#endif
     if (!OPT_HAS_SERVO_OUTPUT)
     {
         return;
@@ -126,8 +130,8 @@ static void initialize()
 
     for (int ch = 0; ch < GPIO_PIN_PWM_OUTPUTS_COUNT; ++ch)
     {
+// hack because I don't know how to implement GPIO_PIN_PWM_OUTPUTS the right way
 #if defined(TARGET_R900_RX)
-        static constexpr uint8_t GPIO_PIN_PWM_OUTPUTS__[] = GPIO_PIN_PWM_OUTPUTS;
         uint8_t pin = GPIO_PIN_PWM_OUTPUTS__[ch];
 #else
         uint8_t pin = GPIO_PIN_PWM_OUTPUTS[ch];
