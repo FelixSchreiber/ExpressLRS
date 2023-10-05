@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #if defined(TARGET_R900_RX)
 #include <Servo.h>
+    static constexpr uint8_t pwm_outputs[GPIO_PIN_PWM_OUTPUTS_COUNT] = GPIO_PIN_PWM_OUTPUTS_ARRAY;
 #endif
 class ServoMgr
 {

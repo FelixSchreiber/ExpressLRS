@@ -79,14 +79,11 @@ https://github.com/jaxxzer
      * Note: Right Antenna is selected by default, LOW */
     #define GPIO_PIN_ANTENNA_SELECT PB9
     #define GPIO_PIN_PWM_OUTPUTS_COUNT  8
-    /* the next part doesn't work with GPIO_PIN_PWM_OUTPUTS[ch], therefore I had to hack 
-       all places where this is used. Other PWM receivers use 
-       #define GPIO_PIN_PWM_OUTPUTS hardware_i16_array(HARDWARE_pwm_outputs)
-       I have no idea how to implement this here
-
+    /* 
        Note: PA3 (ch5) and PA2 (ch6) are also defined as UART pins above
     */
-    #define GPIO_PIN_PWM_OUTPUTS        {PB1, PB0, PA7, PA6, PA3, PA2, PA1, PA0}
+    #define GPIO_PIN_PWM_OUTPUTS_ARRAY  {PB1, PB0, PA7, PA6, PA3, PA2, PA1, PA0}
+    #define GPIO_PIN_PWM_OUTPUTS        pwm_outputs
 #else //R9MM_R9MINI
     #define GPIO_PIN_LED_RED        PC1  // Red
     #define GPIO_PIN_LED_GREEN      PB3  // Green

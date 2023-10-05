@@ -160,19 +160,18 @@ static void luaparamMappingChannelOut(struct luaPropertiesCommon *item, uint8_t 
 {
   setLuaUint8Value(&luaMappingChannelOut, arg);
   // Must trigger an event because this is not a persistent config item
-// hack because I don't know how to implement GPIO_PIN_PWM_OUTPUTS the right way
 #if defined(TARGET_R900_RX)
-  static constexpr uint8_t GPIO_PIN_PWM_OUTPUTS__[] = GPIO_PIN_PWM_OUTPUTS;
-  if (GPIO_PIN_PWM_OUTPUTS__[arg-1] == GPIO_PIN_RCSIGNAL_RX)
+  // in case of Jumper R900, use RX pin here
+  if (GPIO_PIN_PWM_OUTPUTS[arg-1] == GPIO_PIN_RCSIGNAL_RX)
 #else
   if (GPIO_PIN_PWM_OUTPUTS[arg-1] == 3)
 #endif
   {
     luaMappingOutputMode.options = rxModes;
   }
-// hack because I don't know how to implement GPIO_PIN_PWM_OUTPUTS the right way
 #if defined(TARGET_R900_RX)
-  else if (GPIO_PIN_PWM_OUTPUTS__[arg-1] == GPIO_PIN_RCSIGNAL_TX)
+  // in case of Jumper R900, use Tx pin here
+  else if (GPIO_PIN_PWM_OUTPUTS[arg-1] == GPIO_PIN_RCSIGNAL_TX)
 #else
   else if (GPIO_PIN_PWM_OUTPUTS[arg-1] == 1)
 #endif
@@ -198,18 +197,10 @@ static void luaparamMappingChannelIn(struct luaPropertiesCommon *item, uint8_t a
 
 static uint8_t configureSerialPin(uint8_t pin, uint8_t sibling, uint8_t oldMode, uint8_t newMode)
 {
-// hack because I don't know how to implement GPIO_PIN_PWM_OUTPUTS the right way
-#if defined(TARGET_R900_RX)
-  static constexpr uint8_t GPIO_PIN_PWM_OUTPUTS__[] = GPIO_PIN_PWM_OUTPUTS;
-#endif
   for (int ch=0 ; ch<GPIO_PIN_PWM_OUTPUTS_COUNT ; ch++)
   {
 // hack because I don't know how to implement GPIO_PIN_PWM_OUTPUTS the right way
-#if defined(TARGET_R900_RX)
-    if (GPIO_PIN_PWM_OUTPUTS__[ch] == sibling)
-#else
     if (GPIO_PIN_PWM_OUTPUTS[ch] == sibling)
-#endif
     {
       // set sibling pin channel settings based on this pins settings
       rx_config_pwm_t newPin3Config;
@@ -243,10 +234,8 @@ static void luaparamMappingOutputMode(struct luaPropertiesCommon *item, uint8_t 
   newPwmCh.val.mode = arg;
 
   // Check if pin == 1/3 and do other pin adjustment accordingly
-// hack because I don't know how to implement GPIO_PIN_PWM_OUTPUTS the right way
 #if defined(TARGET_R900_RX)
-  static constexpr uint8_t GPIO_PIN_PWM_OUTPUTS__[] = GPIO_PIN_PWM_OUTPUTS;
-  if (GPIO_PIN_PWM_OUTPUTS__[ch] == GPIO_PIN_RCSIGNAL_RX)
+  if (GPIO_PIN_PWM_OUTPUTS[ch] == GPIO_PIN_RCSIGNAL_RX)
   {
     newPwmCh.val.mode = configureSerialPin(GPIO_PIN_RCSIGNAL_RX, GPIO_PIN_RCSIGNAL_TX, oldMode, arg);
   }
@@ -256,9 +245,8 @@ static void luaparamMappingOutputMode(struct luaPropertiesCommon *item, uint8_t 
     newPwmCh.val.mode = configureSerialPin(1, 3, oldMode, arg);
   }
 #endif
-// hack because I don't know how to implement GPIO_PIN_PWM_OUTPUTS the right way
 #if defined(TARGET_R900_RX)
-  else if (GPIO_PIN_PWM_OUTPUTS__[ch] == GPIO_PIN_RCSIGNAL_TX)
+  else if (GPIO_PIN_PWM_OUTPUTS[ch] == GPIO_PIN_RCSIGNAL_TX)
   {
     newPwmCh.val.mode = configureSerialPin(GPIO_PIN_RCSIGNAL_TX, GPIO_PIN_RCSIGNAL_RX, oldMode, arg);
   }
